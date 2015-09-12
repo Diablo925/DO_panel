@@ -1,0 +1,91 @@
+<div class="zmodule_content panel" id="zmodule_header_<@ ModuleName @>">
+    <div class="panel-heading">
+        <img src="<@ ModuleIcon @>" width="35" height="35" border="0" alt="<@ ModuleName @>">
+
+        <div class="zmodule_title">
+            <@ ModuleName @>
+        </div>
+
+        <div class="zmodule_desc" id="zmodule_desc_<@ ModuleName @>"><@ ModuleDesc @></div>
+		
+    </div>
+	
+	<@ Result @>
+	
+	<div class="zgrid_wrapper">
+	<form action="./?module=DO_panel&action=key" method="post">
+	<@ Apikey @>
+	</form>
+	</div>
+	
+	
+	<div class="zgrid_wrapper">
+	<h2><: My droplet :></h2>
+		<table class="table">
+		<tr>
+			<th>&nbsp;</th>
+			<th><: Name :></th>
+			<th><: Memmory :></th>
+			<th><: VCpu :></th>
+			<th><: Harddrive size :></th>
+			<th><: IPv4 :></th>
+			<th>&nbsp;</th>
+		</tr>
+				<% loop Droplet %>
+				<form action="./?module=DO_panel&action=action" method="post">
+                <tr>
+                    <td><& Os &></td>
+					<td><& Name &></td>
+					<td><& Memmory &></td>
+					<td><& VCpu &></td>
+					<td><& Hdd &></td>
+					<td><& ip &></td>
+					<td><input type="hidden" name="inId" value="<& Id &>" />
+					<& status &>
+					<button class="button-loader btn btn-warning" type="submit" id="button" name="inAction" id="inReboot" value="reboot">Reboot</button>
+					</td>
+					<@ CSFR_Tag @>	
+				</tr>
+				</form>
+				<% endloop %>	
+		</table>	
+	</div>
+	&nbsp;
+	<div class="zgrid_wrapper">
+	<h2><: Make new droplet :></h2>
+		<table class="table">
+		<tr>
+			<th><: Name :></th>
+			<th><: Select Size :></th>
+			<th><: Select Region :></th>
+			<th><: Select Image :></th>
+			<th><: Select Settings :></th>
+			<th>&nbsp;</th>
+		</tr>
+				<form action="./?module=DO_panel&action=Add" method="post">
+                <tr>
+                    <td><input type="text" name="inName" id="inName" /></td>
+					<td><select name="inSize" id="inSize">
+                                        <% loop SizeList %>
+                                        <option value="<& slug &>"><& slug &></option>
+                                        <% endloop %>
+										</select></td>
+					<td><select name="inRegion" id="inRegion">
+                                        <% loop RegionList %>
+                                        <option value="<& slug &>"><& name &></option>
+                                        <% endloop %>
+										</select></td>
+					<td><select name="inImage" id="inImage">
+                                        <% loop ImageList %>
+                                        <option value="<& slug &>"><& slug &></option>
+                                        <% endloop %>
+										</select></td>
+					<td><input type="checkbox" name="Inbackup" value="true"> Backups
+						<input type="checkbox" name="Inipv6" value="true"> IPv6</td>
+					<td><button class="button-loader btn btn-primary" type="submit" id="button" name="inMake" id="inMake" value="Make">Make droplet</button></td>
+					<@ CSFR_Tag @>	
+				</tr>
+				</form>
+		</table>	
+	</div>
+</div>

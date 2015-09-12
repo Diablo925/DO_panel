@@ -1,0 +1,35 @@
+<?php
+/**
+ *
+ * Installer for Digital oacen CP Module for sentora 1.0.0
+ * Version : 100
+ */
+ 
+require_once('cnf/db.php');
+require_once('dryden/db/driver.class.php');
+require_once('dryden/debug/logger.class.php');
+require_once('dryden/runtime/dataobject.class.php');
+require_once('dryden/sys/versions.class.php');
+require_once('dryden/ctrl/options.class.php');
+require_once('dryden/ctrl/auth.class.php');
+require_once('dryden/ctrl/users.class.php');
+require_once('dryden/fs/director.class.php');
+require_once('inc/dbc.inc.php');
+
+
+//install
+installModule();
+
+function installModule(){
+		global $zdbh;
+
+		$numrows = $zdbh->prepare("CREATE TABLE IF NOT EXISTS sentora_core.x_doapi (
+                                      `apikey` varchar(255) NULL,
+                                      PRIMARY KEY (`apikey`)
+                                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+     		$numrows->execute();
+			$sql = $zdbh->prepare("INSERT INTO sentora_core.x_doapi SET apikey = 'NULL'");
+			$sql->execute();
+			
+}
+?>
