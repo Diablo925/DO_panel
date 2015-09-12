@@ -6,7 +6,7 @@ for comments, discussion, more information and community support.
 
 
 ##Description
-Allows easy to make certificate
+Allow you to controle your DigitalOcean droplets form sentora
 
 ##Author
 Module is edit by Diablo925 [@github](https://github.com/Diablo925) 
