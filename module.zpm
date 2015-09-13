@@ -18,6 +18,42 @@
 	</form>
 	</div>
 	
+	<% if isDetail %>
+	<div class="zform_wrapper">
+	<% loop DetailList %>
+	<h2><: Detail view for :>: <& Name &></h2> 
+	<table class="table">
+		<tr>
+			<th nowrap="nowrap"><: created date :>:</th>
+			<td><& Created &></td>
+			<th nowrap="nowrap"><: Region :>:</th>
+			<td><& region &></td>
+		</tr>
+		<tr>
+			<th nowrap="nowrap"><: Networks Ip v4 :>:</th>
+			<td>Ip address: <& ipv4_add &><br />
+			Netmask: <& ipv4_net &><br />
+			Gateway <& ipv4_gate &></td>
+			<th nowrap="nowrap"><: Networks Ip v6 :>:</th>
+			<td>Ip address: <& ipv6_add &><br />
+			Netmask: <& ipv6_net &><br />
+			Gateway <& ipv6_gate &></td>
+		</tr>
+		<tr>
+			<th nowrap="nowrap"><: kernel name and version :>:</th>
+			<td><& kernel_name &>
+			<th nowrap="nowrap"></th>
+			<td><form action="./?module=DO_panel&action=actiondelete" method="post">
+					<input type="hidden" name="inId" value="<& Id &>" />
+					<button class="button-loader btn btn-danger" type="submit" id="button" name="inAction" id="inAction" value="Delete">Delete droplet</button>
+					</form></td>
+		</tr>
+	</table>
+			
+	<% endloop %>
+	<button class="btn btn-default" type="button" onclick="window.location.href='./?module=DO_panel';return false;"><: Back :></button>
+	</div>
+	<% endif %>
 	
 	<div class="zgrid_wrapper">
 	<h2><: My droplet :></h2>
@@ -32,21 +68,26 @@
 			<th>&nbsp;</th>
 		</tr>
 				<% loop Droplet %>
-				<form action="./?module=DO_panel&action=action" method="post">
+				
                 <tr>
                     <td><& Os &></td>
-					<td><& Name &></td>
-					<td><& Memmory &></td>
+					<td>
+					<form action="./?module=DO_panel&action=Detail" method="post">
+					<input type="hidden" name="inId" value="<& Id &>" />
+					<button class="button-loader btn btn-link" type="submit" id="button" name="inDetail" id="inDetail" value="inDetail"><& Name &></button></td>
+					</form></td>
+					<td><& Memmory &> MB</td>
 					<td><& VCpu &></td>
-					<td><& Hdd &></td>
+					<td><& Hdd &> GB</td>
 					<td><& ip &></td>
-					<td><input type="hidden" name="inId" value="<& Id &>" />
+					<td>
+					<form action="./?module=DO_panel&action=action" method="post">
+					<input type="hidden" name="inId" value="<& Id &>" />
 					<& status &>
-					<button class="button-loader btn btn-warning" type="submit" id="button" name="inAction" id="inReboot" value="reboot">Reboot</button>
+					<button class="button-loader btn btn-warning" type="submit" id="button" name="inAction" id="inReboot" value="reboot">Reboot</button></form>
 					</td>
 					<@ CSFR_Tag @>	
 				</tr>
-				</form>
 				<% endloop %>	
 		</table>	
 	</div>

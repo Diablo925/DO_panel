@@ -10,6 +10,53 @@ class module_controller extends ctrl_module
      * The 'worker' methods.
      */
 	 
+	 
+	 static function getisDetail()
+    {
+        global $controller;
+        $urlvars = $controller->GetAllControllerRequests('URL');
+        return (isset($urlvars['show'])) && ($urlvars['show'] == "Detail");
+    }
+	
+	static function getDetailList()
+    {
+        global $controller;
+        return self::ListDetail($controller->GetControllerRequest('URL', 'other'));
+    }
+	
+	static function ListDetail($id)
+    {
+		global $zdbh;
+		
+		$sql = "SELECT * FROM x_doapi";
+        $sql = $zdbh->prepare($sql);
+        $sql->execute();
+        while ($row = $sql->fetch()) {
+		$apikey = $row["apikey"];
+		}
+		$url = 'https://api.digitalocean.com/v2/droplets/'.$id.'';
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER,TRUE);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    	'Authorization: Bearer '.$apikey.'',
+    	'Content-Type: application/json'));
+		$result =  curl_exec($ch);
+		$data = json_decode($result , true);			
+		$res[] = array('Id' => $data['droplet']['id'], 'Name' => $data['droplet']['name'], 'Created' => $data['droplet']['created_at'], 'kernel_name' => $data['droplet']['kernel']['name'], 'ipv4_add' => $data['droplet']['networks']['v4']['0']['ip_address'], 'ipv4_net' => $data['droplet']['networks']['v4']['0']['netmask'], 'ipv4_gate' => $data['droplet']['networks']['v4']['0']['gateway'], 'ipv6_add' => $data['droplet']['networks']['v6']['0']['ip_address'], 'ipv6_net' => $data['droplet']['networks']['v6']['0']['netmask'], 'ipv6_gate' => $data['droplet']['networks']['v6']['0']['gateway'], 'region' => $data['droplet']['region']['name']);
+    return $res;
+	}
+	 
+	static function doDetail()
+    {
+        global $controller;
+        $formvars = $controller->GetAllControllerRequests('FORM');
+                header('location: ./?module=' . $controller->GetCurrentModule() . '&show=Detail&other=' . $formvars['inId']);
+                exit;
+        return true;
+    } 
+	 
 	  static function ExecuteAddApi($key)
 	 {
 		global $zdbh;
@@ -33,16 +80,35 @@ class module_controller extends ctrl_module
 		}
 		 $data = array("type" => "$type");
 		 $data_string = json_encode($data);
-$url = "https://api.digitalocean.com/v2/droplets/".$id."/actions";
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'Authorization: Bearer '. $apikey .'',
-    'Content-Type: application/json',
-      'Content-Length: ' . strlen($data_string))
-);
-curl_exec($ch);	 
+		 $url = "https://api.digitalocean.com/v2/droplets/".$id."/actions";
+		 $ch = curl_init($url);
+		 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		 curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+		 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer '. $apikey .'',
+												    'Content-Type: application/json',
+													'Content-Length: ' . strlen($data_string)));
+		curl_exec($ch);	 
+		self::$ok = true;
+        return true;
+	 }
+	 
+	 static function ExecuteDelete($id)
+	 {
+		 global $zdbh;
+		 global $controller;
+		 $sql = "SELECT * FROM x_doapi";
+        $sql = $zdbh->prepare($sql);
+        $sql->execute();
+        while ($row = $sql->fetch()) {
+		$apikey = $row["apikey"];
+		}
+		$url = "https://api.digitalocean.com/v2/droplets/".$id. "";
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    	'Authorization: Bearer '. $apikey .'',
+    	'Content-Type: application/json'));
+		curl_exec($ch);	 
 		self::$ok = true;
         return true;
 	 }
@@ -240,7 +306,16 @@ curl_exec($ch);
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         $formvars = $controller->GetAllControllerRequests('FORM');
-        if (self::ExecuteAction($formvars['inAction'], $formvars['inId']))
+        if (self::ExecuteAction($formvars['inAction'], $formvars['inId'], $formvars['inpost']))
+        return true;
+    }
+	
+	static function doactiondelete()
+    {
+        global $controller;
+        $currentuser = ctrl_users::GetUserDetail();
+        $formvars = $controller->GetAllControllerRequests('FORM');
+        if (self::ExecuteDelete($formvars['inId']))
         return true;
     }
 	
@@ -261,6 +336,7 @@ curl_exec($ch);
         $currentuser = ctrl_users::GetUserDetail();
         return self::ListDroplet($currentuser['username']);
     }
+	
 	
 	static function getSizeList()
     {
